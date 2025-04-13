@@ -1,11 +1,14 @@
 <script lang="ts">
-  interface UserBadgeProps {
+  import { twMerge } from 'tailwind-merge';
+  import type { HTMLAnchorAttributes } from 'svelte/elements';
+
+  interface UserBadgeProps extends Pick<HTMLAnchorAttributes, 'class'> {
     name: string;
     username: string;
   }
-  const { name, username }: UserBadgeProps = $props();
+  const { name, username, class: classProp }: UserBadgeProps = $props();
 </script>
 
-<a class="font-medium text-accent hover:text-accent-alt" href={`/u/${username}`}>
+<a class={twMerge('font-medium text-accent hover:text-accent-alt', classProp)} href={`/u/${username}`}>
   {name}
 </a>

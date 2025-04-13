@@ -6,6 +6,11 @@
   import Loading from '$lib/component/Loading.svelte';
   import UserBadge from '$lib/component/UserBadge.svelte';
   import { page } from '$app/stores';
+  import Button from '$lib/component/Button.svelte';
+  import { localStore } from '$lib/store/localStorage.svelte';
+  import FluentWeatherSunny16Filled from '~icons/fluent/weather-sunny-16-filled';
+  import FluentWeatherMoon16Filled from '~icons/fluent/weather-moon-16-filled';
+  import FluentCircleHalfFill16Regular from '~icons/fluent/circle-half-fill-16-regular';
 
   let { children, data } = $props();
   let { user } = $derived(data);
@@ -13,6 +18,12 @@
     let url = $page.url;
     return encodeURIComponent(url.toString().replace(`${url.protocol}//${url.host}`, ''));
   });
+  let currentTheme = localStore('theme', 'auto');
+  function changeTheme() {
+    const nextTheme = currentTheme.value === 'light' ? 'dark' : currentTheme.value === 'dark' ? 'auto' : 'light';
+    currentTheme.value = nextTheme;
+  }
+  let { value: themeValue } = $derived(currentTheme);
 </script>
 
 <!-- web fonts -->
@@ -26,16 +37,25 @@
 </svelte:head>
 
 <div class="max-w-article mx-page-horizontal flex flex-col gap-y-l sm:mx-auto min-h-svh">
-  <header class="flex flex-row items-center justify-between py-xs">
+  <header class="flex flex-row items-center py-xs gap-x-2">
     <a href="/" class="flex flex-row items-center gap-x-xs">
       {#if $navigating}<Loading />{:else}<Logo --size="var(--space-l)" />{/if}
       <p class="text-2xl font-serif font-bold">EXODUS</p>
     </a>
     {#if user}
-      <UserBadge name={user.name} username={user.username} />
+      <UserBadge class="ml-auto" name={user.name} username={user.username} />
     {:else}
-      <a class="text-accent" href={`/auth?next=${current}`}>注册/登录</a>
+      <a class="text-accent ml-auto" href={`/auth?next=${current}`}>注册/登录</a>
     {/if}
+    <Button onclick={changeTheme} class="rounded-full w-fit p-1">
+      {#if themeValue === 'light'}
+        <FluentWeatherSunny16Filled />
+      {:else if themeValue === 'dark'}
+        <FluentWeatherMoon16Filled />
+      {:else}
+        <FluentCircleHalfFill16Regular class="rotate-90" />
+      {/if}
+    </Button>
   </header>
 
   <main class="flex flex-col gap-y-l pb-l flex-1">
